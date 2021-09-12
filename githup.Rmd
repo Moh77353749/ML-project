@@ -1,0 +1,125 @@
+---
+title: "project"
+output:
+  html_document:
+    df_print: paged
+---
+```{r, echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(C50)
+library(gmodels)
+library(rpart)
+library(caret)
+library(rpart.plot)
+library(Metrics)
+library(ranger)
+```
+
+# ML course project.
+
+This document is for Lab 1. The document will be divided into 4 sections to answer every question in the assignment.
+
+
+#### reading the data set
+
+```{r}
+training = read.csv("pml-training.csv") 
+testing=read.csv('pml-testing.csv')
+head(training)
+
+```
+
+### Explore the data set
+
+```{r}
+str(training)
+```
+Remove columns with missing values.
+```{r}
+training=training[ , colSums(is.na(training)) == 0]
+training=training
+testing=testing[,colSums(is.na(testing))==0]
+```
+
+Removing Columns with large amount of empty observations.
+```{r}
+training$kurtosis_yaw_belt=NULL
+
+training$skewness_roll_belt=NULL
+training$kurtosis_picth_belt=NULL
+training$kurtosis_roll_belt=NULL
+training$kurtosis_roll_arm=NULL
+training$kurtosis_picth_arm=NULL
+training$skewness_roll_belt.1=NULL
+training$skewness_yaw_belt=NULL
+training$max_yaw_belt=NULL
+training$min_yaw_belt=NULL
+training$amplitude_yaw_belt=NULL
+training$kurtosis_roll_arm=NULL
+training$kurtosis_picth_arm=NULL
+training$kurtosis_yaw_arm=NULL
+training$skewness_roll_arm=NULL
+training$skewness_pitch_arm=NULL
+training$skewness_yaw_arm=NULL
+training$kurtosis_roll_dumbbell=NULL
+training$kurtosis_picth_dumbbell=NULL
+training$kurtosis_yaw_dumbbell=NULL
+training$skewness_roll_dumbbell=NULL
+training$skewness_pitch_dumbbell=NULL
+training$skewness_yaw_dumbbell=NULL
+training$max_yaw_dumbbell=NULL
+training$min_yaw_dumbbell=NULL
+training$amplitude_yaw_dumbbell=NULL
+training$amplitude_yaw_forearm=NULL
+training$min_yaw_forearm=NULL
+training$max_yaw_forearm=NULL
+training$skewness_yaw_forearm=NULL
+training$skewness_pitch_forearm=NULL
+training$skewness_roll_forearm=NULL
+training$kurtosis_yaw_forearm=NULL
+training$kurtosis_picth_forearm=NULL
+training$kurtosis_roll_forearm=NULL
+```
+
+## Doing cross Vaildation.
+### splitting the training.
+```{r}
+
+set.seed(198)
+intrain=createDataPartition(y=training$classe,p=0.7,list=FALSE)
+train=training[intrain,]
+test=training[-intrain,]
+
+
+```
+
+### prediciton for the cross validation
+```{r}
+Model2<-C5.0(as.factor(classe) ~total_accel_belt, data= train)
+predictions2 = predict(Model2,test)
+
+```
+
+
+
+### Run the model.
+I have chosen a random forest model
+
+```{r}
+Model<-C5.0(as.factor(classe) ~total_accel_belt, data= training)
+```
+
+### Create predictions
+
+```{r}
+predictions = predict(Model,testing)
+predictions
+```
+
+
+
+The model is not accurate 100% because the training set contain many missing values which have affected the results.
+
+
